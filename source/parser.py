@@ -4,6 +4,10 @@ import argparse
 
 def get_parser():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-orc', '--oracle',
+                        type=str,
+                        help='select dataset, value = 300/600/1600, default = 300',
+                        default='300')
     parser.add_argument('-exp', '--experiment_root',
                         type=str,
                         help='root where to store models, losses and accuracies',

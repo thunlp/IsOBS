@@ -33,7 +33,7 @@ def init_seed(opt):
 def init_dataloader(opt, mode):
     # dataset
     global n_classes
-    dataset = datasets.ImageFolder("./data_oct/" + mode + "_300",transform=transform)  
+    dataset = datasets.ImageFolder("./data_oct/" + mode + "_" + opt.oracle,transform=transform)  
     n_classes = len(np.unique([dataset[i][1] for i in range(len(dataset))]))
     print("n_classes", mode, n_classes)
     if n_classes < opt.classes_per_it_tr or n_classes < opt.classes_per_it_val:
@@ -105,8 +105,6 @@ def initialize(options):
     '''
     初始化训练所需的模型及数据集
     '''
-    global tr_dataloader,model,optim,lr_scheduler
-
     if not os.path.exists(options.experiment_root):
         os.makedirs(options.experiment_root)
     if torch.cuda.is_available() and not options.cuda:
@@ -120,18 +118,21 @@ def initialize(options):
                                                    gamma=options.lr_scheduler_gamma,
                                                    step_size=options.lr_scheduler_step)
 
+    return tr_dataloader,model,optim,lr_scheduler
+
 def main():
     options = get_parser().parse_args()
 
-    #initialize(options)
-    #train(
-    #    opt=options,
-    #    tr_dataloader=tr_dataloader,
-    #    val_dataloader=None,
-    #    model=model,
-    #    optim=optim,
-    #    lr_scheduler=lr_scheduler
-    #)
+    tr_dataloader, model, optim, lr_scheduler = initialize(options)
+
+    train(
+        opt=options,
+        tr_dataloader=tr_dataloader,
+        val_dataloader=None,
+        model=model,
+        optim=optim,
+        lr_scheduler=lr_scheduler
+    )
 
     # 加载训练好的model
     model = ProtoNet().to('cuda:0')
@@ -140,7 +141,7 @@ def main():
         model.load_state_dict(
             torch.load("./model_save/model_{}.pth".format(epoch))
         )
-        test_model(options, model)
+        test_model(options, model,n_classes = n_classes)
 
 if __name__ == '__main__':
     main()

@@ -29,10 +29,10 @@ def get_representation(opt,test_dataloader,model,full_size):
     # print("prototpyes",prototypes.size())
     return prototypes
 
-def test_model(options,model):
+def test_model(options,model,n_classes):
     # 获取支撑集
-    n_classes=361;  # 如果跑oracle300就是361，oracle600是617.oracle1600是1621
-    test_dataset_c = datasets.ImageFolder("./data_oct/train_300",transform=transform)  # train_300/train_600/train_1600
+    #n_classes=361;  # 如果跑oracle300就是361，oracle600是617.oracle1600是1621
+    test_dataset_c = datasets.ImageFolder("./data_oct/train_"+options.oracle,transform=transform)  # train_300/train_600/train_1600
     prototypes=torch.empty(n_classes,576)
     head=0
     tail=0
@@ -51,7 +51,7 @@ def test_model(options,model):
     # 做测试
     model.eval()
     device = 'cuda:0' if torch.cuda.is_available() and options.cuda else 'cpu'
-    test_dataset = datasets.ImageFolder("./data_oct/test_300",transform=transform)  # test_300/test_600/test_1600
+    test_dataset = datasets.ImageFolder("./data_oct/test_"+options.oracle,transform=transform)  # test_300/test_600/test_1600
     correct=0
     correct_3=0
     correct_5=0
